@@ -1,0 +1,38 @@
+# Configuration du module foot. Toute la chaîne de données est reconstruite à partir de ce fichier.
+
+source:
+  base_url: "https://www.football-data.co.uk/mmz4281"
+  request_delay_s: 1.0        # politesse envers le site (une requête par seconde)
+  timeout_s: 30
+
+# Saisons au format "AAAA-AAAA". La saison en cours (2026-2027) est volontairement exclue :
+# elle servira de test "forward" vraiment hors échantillon une fois le protocole figé.
+seasons:
+  first: 2005
+  last: 2025                  # = saison 2025-2026, dernière saison complète
+
+# Deux niveaux par pays : on veut tester l'hypothèse "moins de liquidité => plus d'inefficience".
+leagues:
+  E0: { country: eng, tier: 1, name: "Premier League" }
+  E1: { country: eng, tier: 2, name: "Championship" }
+  SP1: { country: esp, tier: 1, name: "La Liga" }
+  SP2: { country: esp, tier: 2, name: "Segunda Division" }
+  I1: { country: ita, tier: 1, name: "Serie A" }
+  I2: { country: ita, tier: 2, name: "Serie B" }
+  D1: { country: ger, tier: 1, name: "Bundesliga" }
+  D2: { country: ger, tier: 2, name: "2. Bundesliga" }
+  F1: { country: fra, tier: 1, name: "Ligue 1" }
+  F2: { country: fra, tier: 2, name: "Ligue 2" }
+  N1: { country: ned, tier: 1, name: "Eredivisie" }
+  P1: { country: por, tier: 1, name: "Primeira Liga" }
+
+paths:
+  raw: data/raw/foot
+  processed: data/processed/foot
+  reports: reports
+  team_aliases: configs/team_aliases_foot.yaml
+
+quality:
+  overround_min: 1.00         # en dessous : arbitrage apparent, donc erreur de données
+  overround_max: 1.20         # au-dessus : cote périmée ou faute de saisie probable
+  overround_min_best_price: 0.90  # market_max (meilleure cote multi-books) : < 1 possible et réel

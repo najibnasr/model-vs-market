@@ -1,0 +1,15 @@
+# Correspondance manuelle "nom brut -> nom canonique", par pays.
+# On n'ajoute une ligne que lorsque l'audit (reports/teams_foot.csv) montre qu'un même club
+# apparaît sous deux graphies. Chaque ajout doit être justifiable : c'est une décision de données.
+#
+# Exemple de format :
+# eng:
+#   "Man United": "Man United"
+#   "Manchester Utd": "Man United"
+eng: {}
+esp: {}
+ita: {}
+ger: {}
+fra: {}
+ned: {}
+por: {}
