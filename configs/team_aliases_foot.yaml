@@ -2,14 +2,18 @@
 # On n'ajoute une ligne que lorsque l'audit (reports/teams_foot.csv) montre qu'un même club
 # apparaît sous deux graphies. Chaque ajout doit être justifiable : c'est une décision de données.
 #
-# Exemple de format :
-# eng:
-#   "Man United": "Man United"
-#   "Manchester Utd": "Man United"
+# Cas examinés et volontairement NON fusionnés (clubs juridiquement distincts) :
+#   fra : Ajaccio (AC Ajaccio) / Ajaccio GFCO ; Bastia (SC Bastia) / CA Bastia
+#   esp : Murcia (Real Murcia) / Ciudad de Murcia / UCAM Murcia ; Alicante / Hercules
+#   por : Aves (CD Aves, disparu) / AVS (AVS Futebol SAD, 2023) ;
+#         Est Amadora (disparu en 2011) / Estrela (CF Estrela da Amadora, refondé en 2020)
 eng: {}
-esp: {}
+esp:
+  "Leonesa": "Cultural Leonesa"
 ita: {}
 ger: {}
 fra: {}
-ned: {}
+ned:
+  "Roda": "Roda JC"
+  "Sparta": "Sparta Rotterdam"
 por: {}

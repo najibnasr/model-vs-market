@@ -12,3 +12,7 @@ data/interim/*
 data/processed/*
 !data/**/.gitkeep
 !data/README.md
+
+# Rapports d'audit générés par `make data` (les figures du write-up seront versionnées à part)
+reports/*.csv
+reports/*.json

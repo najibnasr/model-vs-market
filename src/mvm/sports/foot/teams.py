@@ -15,6 +15,7 @@ import pandas as pd
 
 
 def slugify(name: str) -> str:
+    name = name.replace("ß", "ss")  # NFKD ne décompose pas ß : "Preußen" -> "preussen"
     ascii_name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
     return re.sub(r"[^a-z0-9]+", "-", ascii_name.lower()).strip("-")
 

@@ -85,3 +85,7 @@ def test_team_id_is_country_scoped_not_league_scoped():
     assert teams.team_id("Man United", "eng", aliases) == teams.team_id(
         "Manchester United", "eng", aliases
     )
+
+
+def test_slugify_handles_eszett():
+    assert teams.team_id("Preußen Münster", "ger", {}) == "ger:preussen-munster"
