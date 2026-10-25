@@ -36,3 +36,22 @@ quality:
   overround_min: 1.00         # en dessous : arbitrage apparent, donc erreur de données
   overround_max: 1.20         # au-dessus : cote périmée ou faute de saisie probable
   overround_min_best_price: 0.90  # market_max (meilleure cote multi-books) : < 1 possible et réel
+
+# ---------------------------------------------------------------------------------------------
+# Protocole d'évaluation (étape b). FIGÉ le 2026-10-25, avant toute modélisation.
+# Toute modification ultérieure doit être justifiée dans docs/protocol.md (section "Amendements").
+# ---------------------------------------------------------------------------------------------
+evaluation:
+  burn_in_last: 2011-2012       # 2005-2012 : les modèles apprennent, aucune prédiction notée
+  eval_first: 2012-2013         # début de Pinnacle : première saison notée
+  tuning_last: 2016-2017        # 2012-2017 : réglage des hyperparamètres (validation)
+  test_first: 2017-2018         # 2017-2025 : test, regardé UNE fois par modèle final
+  test_last: 2024-2025
+  holdout: 2025-2026            # Pinnacle partiel : test secondaire, référence de repli
+  outcomes: [H, D, A]
+  reference: { bookmaker: pinnacle, timing: closing, margin_method: shin }
+  fallback_reference: { bookmaker: market_avg, timing: closing, margin_method: shin }
+  primary_metric: log_loss
+  secondary_metrics: [rps, brier]
+  time_block: week              # unité de walk-forward et de bootstrap
+  bootstrap: { n_boot: 2000, seed: 20261025, alpha: 0.05 }

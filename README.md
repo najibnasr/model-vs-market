@@ -3,7 +3,7 @@
 Probabilistic models of match outcomes benchmarked against bookmaker prices, with an honest
 value-betting backtest (fractional Kelly, transaction costs, closing line value).
 
-**Status:** step (a) done, data pipeline and canonical schema for football.
+**Status:** steps (a) data pipeline and (b) frozen evaluation protocol done for football.
 
 The goal is not to find a money machine. Beating closing odds after costs is very hard; the
 deliverable is a rigorous, reproducible comparison between a model and an efficient market.
@@ -32,6 +32,7 @@ src/mvm/
 make install        # uv sync
 make data           # download football-data.co.uk CSVs + build canonical tables
 make test
+make market-baseline   # how good is the closing market? (the bar to clear)
 ```
 
 Outputs: `data/processed/foot/*.parquet`, and audit reports in `reports/`
@@ -42,7 +43,7 @@ See [`data/README.md`](data/README.md) for the data card.
 ## Roadmap (football)
 
 - [x] (a) Data pipeline and storage schema
-- [ ] (b) Frozen evaluation protocol: season-based walk-forward splits, margin removal
+- [x] (b) Frozen evaluation protocol ([`docs/protocol.md`](docs/protocol.md)): walk-forward splits, margin removal, metrics
 - [ ] (c) Elo baseline
 - [ ] (d) Dixon-Coles and comparison
 - [ ] (e) Value-betting backtest: fractional Kelly, CLV, breakdown by league and period

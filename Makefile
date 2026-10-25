@@ -1,4 +1,4 @@
-.PHONY: install data data-offline test lint
+.PHONY: install data data-offline test lint market-baseline
 
 # PYTHONPATH=src : robuste même si l'install éditable n'est pas vue par Python (cas macOS + Python 3.13)
 RUN = PYTHONPATH=src uv run
@@ -20,3 +20,7 @@ test:
 lint:
 	uv run ruff check src tests
 	uv run ruff format --check src tests
+
+# Étape (b) : performance du marché sur la période d'évaluation (la barre à franchir)
+market-baseline:
+	$(RUN) python -m mvm.sports.foot.market_baseline --config configs/foot.yaml
