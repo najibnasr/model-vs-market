@@ -54,6 +54,8 @@ NOT_ODDS = {"BbAH"}
 
 _book_alt = "|".join(sorted(map(re.escape, BOOKMAKERS), key=len, reverse=True))
 ODDS_COL_RE = re.compile(rf"^(?P<book>{_book_alt})(?P<closing>C?)(?P<outcome>[HDA])$")
+# Handicap asiatique (PAHH, MaxAHA, PCAHH...) : autre marché, hors périmètre du 1X2.
+AH_COL_RE = re.compile(r"^[A-Za-z0-9]*AH[HA]$")
 LOOKS_LIKE_ODDS_RE = re.compile(r"^[A-Za-z0-9]{1,5}C?[HDA]$")
 
 RESULT_ALIASES: dict[str, tuple[str, ...]] = {
@@ -113,7 +115,7 @@ def classify_odds_columns(columns: list[str]) -> tuple[dict[str, tuple[str, str,
     mapping: dict[str, tuple[str, str, str]] = {}
     unrecognized: list[str] = []
     for col in columns:
-        if col in NOT_ODDS:
+        if col in NOT_ODDS or AH_COL_RE.match(col):
             continue
         m = ODDS_COL_RE.match(col)
         if m:

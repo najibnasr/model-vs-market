@@ -37,7 +37,9 @@ def test_odds_column_mapping(col, expected):
 
 
 def test_non_odds_columns_ignored():
-    mapping, unrecognized = parse.classify_odds_columns(["FTR", "HTR", "BbAH", "AHh", "FTHG"])
+    mapping, unrecognized = parse.classify_odds_columns(
+        ["FTR", "HTR", "BbAH", "AHh", "FTHG", "PAHH", "MaxAHA", "PCAHH"]
+    )
     assert mapping == {}
     assert unrecognized == []
 
