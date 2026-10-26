@@ -3,7 +3,7 @@
 Probabilistic models of match outcomes benchmarked against bookmaker prices, with an honest
 value-betting backtest (fractional Kelly, transaction costs, closing line value).
 
-**Status:** steps (a) data pipeline and (b) frozen evaluation protocol done for football.
+**Status:** football steps (a) data, (b) frozen protocol and (c) Elo baseline done.
 
 The goal is not to find a money machine. Beating closing odds after costs is very hard; the
 deliverable is a rigorous, reproducible comparison between a model and an efficient market.
@@ -46,7 +46,7 @@ See [`data/README.md`](data/README.md) for the data card.
 
 - [x] (a) Data pipeline and storage schema
 - [x] (b) Frozen evaluation protocol ([`docs/protocol.md`](docs/protocol.md)): walk-forward splits, margin removal, metrics
-- [ ] (c) Elo baseline
+- [x] (c) Elo baseline ([`docs/results_elo.md`](docs/results_elo.md)): closes 76% of the gap between base rates and the closing market
 - [ ] (d) Dixon-Coles and comparison
 - [ ] (e) Value-betting backtest: fractional Kelly, CLV, breakdown by league and period
 - [ ] (f) Streamlit dashboard

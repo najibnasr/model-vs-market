@@ -35,6 +35,49 @@ goal-margin multiplier on, ordered-logit calibration on the last 15 seasons per 
    and a calibration learned on past seasons cannot adapt within the season.
 3. Elo still beats base rates by about 0.05.
 
-## Test period (2017-18 to 2024-25)
+## Test period (2017-18 to 2024-25), run once on 2026-10-26
 
-_Run once with `make test-elo`, filled in after the run._
+35,647 matches, common sample with the market.
+
+| Source | Log-loss | RPS | Brier |
+|---|---|---|---|
+| League base rates | 1.0756 | 0.2280 | 0.6509 |
+| **Elo** | **1.0121** | **0.2064** | **0.6061** |
+| Pinnacle close (Shin) | 0.9925 | 0.2003 | 0.5926 |
+
+- Elo vs market: **+0.0197**, 95% CI [+0.0175, +0.0218]. Behind the market in all 12 leagues.
+- Elo vs base rates: -0.0635, CI [-0.0671, -0.0598].
+- Elo closes **76%** of the base-rate-to-market gap (77% on the tuning period): stable.
+
+| Season | Elo | Market | Gap |
+|---|---|---|---|
+| 2017-18 | 1.0016 | 0.9795 | 0.0221 |
+| 2018-19 | 1.0050 | 0.9880 | 0.0170 |
+| 2019-20 | 1.0287 | 1.0129 | 0.0158 |
+| 2020-21 | 1.0239 | 0.9998 | **0.0241** |
+| 2021-22 | 1.0166 | 0.9946 | 0.0220 |
+| 2022-23 | 1.0070 | 0.9934 | 0.0136 |
+| 2023-24 | 1.0062 | 0.9840 | 0.0222 |
+| 2024-25 | 1.0090 | 0.9885 | 0.0205 |
+
+### Checking the pre-registered expectations
+
+1. **Confirmed.** Gap of +0.0197, inside the expected range [+0.012, +0.022], though larger
+   than on the tuning period (+0.0166).
+2. **Weakly supported only.** 2020-21 is the worst season for Elo (+0.0241), but barely above
+   2017-18 and 2023-24 (+0.022). Season-level differences of this size are within noise. We do
+   not claim a Covid effect from this table.
+3. **Confirmed.** Elo beats base rates by 0.064.
+
+### What the test period teaches
+
+- **The home-advantage diagnosis is confirmed, and stronger.** Elo predicts 45.2% home wins
+  against 43.4% observed (+1.8 points, versus +1.0 on the tuning period) and under-predicts away
+  wins (28.3% vs 30.0%). The market stays within 0.2 points. Home advantage kept falling over the
+  test period and a calibration learned on up to 15 past seasons lags behind. This is the main,
+  identifiable weakness to fix in step (d).
+- **The market favourite-longshot hypothesis did not replicate.** On the test period, outcomes
+  priced above 75% happen 81.8% of the time against 81.6% predicted: no bias. A deviation appears
+  in a different bucket (60-75%: 68.4% observed vs 66.4% predicted), but chasing a new bucket
+  after the pre-specified one failed is exactly the forking-paths error. Conclusion: no evidence
+  of an exploitable bias in Pinnacle closing prices.
