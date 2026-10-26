@@ -62,13 +62,17 @@ evaluation:
 # ---------------------------------------------------------------------------------------------
 models:
   elo:
+    # FIGÉ le 2026-10-26 après 3 grilles sur la période de réglage (2012-13 à 2016-17 uniquement).
+    # Log-loss de réglage : 1.0194 (grille 1) -> 1.0149 (grille 2) -> 1.0139 (grille 3).
+    # Gain principal : new_team_offset (+100 -> -50), un nouveau venu est surtout un promu de D3.
+    # calib_seasons 15 et 99 sont indiscernables ici (moins de 15 saisons d'historique) : 15 retenu.
     params:
-      k: 20
-      home_advantage: 60
-      season_regression: 0.2
-      new_team_offset: 100
+      k: 15
+      home_advantage: 70
+      season_regression: 0.1
+      new_team_offset: -50
       use_margin: true
-      calib_seasons: 6
+      calib_seasons: 15
     # Grille 3 (dernière). Grille 1 : K=30 au bord. Grille 2 : K=20, new_team_offset=0 et
     # calib_seasons=10 tous au bord. Une équipe "jamais vue" est surtout un promu de 3e division
     # entrant en D2 : souvent fort, d'où un décalage possiblement NÉGATIF. On l'explore.
