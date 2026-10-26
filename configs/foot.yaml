@@ -91,7 +91,10 @@ models:
       xi: 0.0035
       l2: 3.0
       max_age_days: 1460
+    # Grille 2 (dernière). Grille 1 : xi = 0.0015 au bord bas, à égalité avec 0.0025 (1.01531 contre
+    # 1.01536). La valeur de l'article (0.0065) est nettement moins bonne (1.0227). Avec un xi
+    # plus petit, la fenêtre de 4 ans tronque des poids non négligeables : on teste aussi 6 ans.
     grid:
-      xi: [0.0015, 0.0025, 0.0035, 0.005, 0.0065]
-      l2: [1.0, 3.0, 10.0]
-      max_age_days: [1460]
+      xi: [0.0007, 0.001, 0.0015, 0.002]
+      l2: [2.0, 3.0, 5.0]
+      max_age_days: [1460, 2190]
