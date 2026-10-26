@@ -69,13 +69,13 @@ models:
       new_team_offset: 100
       use_margin: true
       calib_seasons: 6
-    # Grille 2 (après le 1er tuning) : K=30 était au BORD de la grille et la régression
-    # intersaison à 0 aussi ; on élargit K et on explore les 2 paramètres laissés fixes.
-    # L'avantage du terrain (quasi sans effet) est fixé à 70.
+    # Grille 3 (dernière). Grille 1 : K=30 au bord. Grille 2 : K=20, new_team_offset=0 et
+    # calib_seasons=10 tous au bord. Une équipe "jamais vue" est surtout un promu de 3e division
+    # entrant en D2 : souvent fort, d'où un décalage possiblement NÉGATIF. On l'explore.
     grid:
-      k: [20, 25, 30, 35, 40, 50]
+      k: [10, 15, 20, 25]
       home_advantage: [70]
       season_regression: [0.0, 0.1]
-      new_team_offset: [0, 100, 200]
-      calib_seasons: [3, 6, 10]
+      new_team_offset: [-100, -50, 0, 50]
+      calib_seasons: [10, 15, 99]
       use_margin: [true]
