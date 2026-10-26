@@ -49,7 +49,8 @@ def proportional(odds) -> np.ndarray:
       3. diviser chaque ligne par sa somme (attention à l'axe et au broadcasting numpy).
     Les tests sont dans tests/core/test_odds.py : `make test` doit passer sans "skipped".
     """
-    raise NotImplementedError("proportional() : à implémenter (voir docstring)")
+    q = 1.0 / _as_2d(odds)
+    return q / q.sum(axis=1, keepdims=True)
 
 
 def _shin_solve(odds) -> tuple[np.ndarray, np.ndarray]:
