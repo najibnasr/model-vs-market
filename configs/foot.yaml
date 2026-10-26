@@ -55,3 +55,22 @@ evaluation:
   secondary_metrics: [rps, brier]
   time_block: week              # unité de walk-forward et de bootstrap
   bootstrap: { n_boot: 2000, seed: 20261025, alpha: 0.05 }
+
+# ---------------------------------------------------------------------------------------------
+# Modèles (étape c et suivantes). `params` = réglage retenu, `grid` = espace exploré en tuning.
+# `params` ne doit être modifié qu'à partir de reports/tuning_<modele>.csv (période de réglage).
+# ---------------------------------------------------------------------------------------------
+models:
+  elo:
+    params:
+      k: 20
+      home_advantage: 60
+      season_regression: 0.2
+      new_team_offset: 100
+      use_margin: true
+      calib_seasons: 6
+    grid:
+      k: [10, 15, 20, 25, 30]
+      home_advantage: [40, 70, 100]
+      season_regression: [0.0, 0.2, 0.35]
+      use_margin: [true, false]

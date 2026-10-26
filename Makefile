@@ -1,4 +1,4 @@
-.PHONY: install data data-offline test lint market-baseline
+.PHONY: install data data-offline test lint market-baseline tune-elo eval-elo
 
 # PYTHONPATH=src : robuste même si l'install éditable n'est pas vue par Python (cas macOS + Python 3.13)
 RUN = PYTHONPATH=src uv run
@@ -24,3 +24,10 @@ lint:
 # Étape (b) : performance du marché sur la période d'évaluation (la barre à franchir)
 market-baseline:
 	$(RUN) python -m mvm.sports.foot.market_baseline --config configs/foot.yaml
+
+# Étape (c) : Elo. Le tuning ne voit que 2012-13 à 2016-17.
+tune-elo:
+	$(RUN) python -m mvm.sports.foot.run_model tune --model elo
+
+eval-elo:
+	$(RUN) python -m mvm.sports.foot.run_model eval --model elo --split tuning

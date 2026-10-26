@@ -33,6 +33,8 @@ make install        # uv sync
 make data           # download football-data.co.uk CSVs + build canonical tables
 make test
 make market-baseline   # how good is the closing market? (the bar to clear)
+make tune-elo          # grid search on the tuning seasons only
+make eval-elo          # Elo vs market vs naive base rates, tuning seasons
 ```
 
 Outputs: `data/processed/foot/*.parquet`, and audit reports in `reports/`
