@@ -79,6 +79,40 @@ treating them as independent would understate the variance.
 - The model "beats" the closing market by a large margin (say more than 0.01 in log-loss) on the
   whole test period: assume leakage until proven otherwise.
 
+## Results of the pre-registered checks (run on 2026-10-25)
+
+`make market-baseline`, eval seasons 2012-13 onwards. Paired log-loss differences, 95% CI
+clustered by week.
+
+| Comparison | Mean diff | 95% CI | Reading |
+|---|---|---|---|
+| Pinnacle close vs Pinnacle pre-match | -0.00267 | [-0.00326, -0.00210] | The close is sharper: information arrives in the last days (team news). |
+| Pinnacle close vs market-average close | -0.00031 | [-0.00058, -0.00005] | Pinnacle is sharper, by a small but significant margin. |
+| Average close vs average pre-match | -0.00298 | [-0.00381, -0.00216] | Same effect as for Pinnacle. |
+| Shin vs proportional (Pinnacle close) | -0.00017 | [-0.00026, -0.00009] | Shin beats proportional: favourite-longshot bias is real. |
+| Shin vs power (Pinnacle close) | +0.00004 | [+0.00001, +0.00008] | Power is marginally better than Shin. |
+
+Market level (Pinnacle close, Shin): log-loss 0.954 in top tiers, 1.041 in second tiers
+(uniform forecast: ln 3 = 1.099).
+
+**Consequences, applied without changing the rules above:**
+
+1. **Fallback check failed.** The market average is significantly less sharp than Pinnacle.
+   It remains the only reference for 2025-26 onwards, so holdout and forward results against it
+   are reported as *optimistic*: an edge against the average overstates the edge against a sharp
+   close. Moreover, the average's overround jumps by about 1.5 points in 2025-26 in every
+   league, which suggests its composition changed (possibly without Pinnacle): the 2019-2025
+   validation may not even transfer. The holdout is therefore secondary evidence only.
+2. **Reference stays Shin.** Power is better by 0.00004, about 70 times less than the
+   close-vs-pre-match gap: practically irrelevant. Switching after seeing results is exactly
+   what pre-registration forbids. Power stays as a robustness check.
+3. **Scale for later results:** the whole informational value of the last days before kick-off
+   is about 0.003 in log-loss. A model claiming to beat the close by more than that should be
+   treated as suspect (section 7).
+4. **Cross-league comparisons:** second tiers have higher log-loss because their matches are more
+   balanced, not necessarily because their markets are less efficient. Model and market are only
+   ever compared within the same league.
+
 ## Amendments
 
 _None yet._
