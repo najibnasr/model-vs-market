@@ -30,7 +30,7 @@ def expected_home_score(r_home: float, r_away: float, home_advantage: float) -> 
     avec 400 points d'écart, E = 10/11, environ 0.91.
     Les tests sont dans tests/core/test_elo.py.
     """
-    raise NotImplementedError("expected_home_score() : à implémenter (voir docstring)")
+    return 1 / (1 + 10 ** (-(r_home + home_advantage - r_away) / 400))
 
 
 def goal_margin_multiplier(goal_diff: int) -> float:
