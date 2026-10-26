@@ -48,7 +48,7 @@ def time_decay_weights(days_ago: np.ndarray, xi: float) -> np.ndarray:
 
     À IMPLÉMENTER PAR NAJIB (voir le message de Claude pour la ligne exacte).
     """
-    raise NotImplementedError("time_decay_weights() : à implémenter")
+    return np.exp(-xi * days_ago)
 
 
 def dc_tau(x, y, lam, mu, rho):
