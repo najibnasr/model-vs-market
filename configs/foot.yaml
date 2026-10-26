@@ -69,8 +69,13 @@ models:
       new_team_offset: 100
       use_margin: true
       calib_seasons: 6
+    # Grille 2 (après le 1er tuning) : K=30 était au BORD de la grille et la régression
+    # intersaison à 0 aussi ; on élargit K et on explore les 2 paramètres laissés fixes.
+    # L'avantage du terrain (quasi sans effet) est fixé à 70.
     grid:
-      k: [10, 15, 20, 25, 30]
-      home_advantage: [40, 70, 100]
-      season_regression: [0.0, 0.2, 0.35]
-      use_margin: [true, false]
+      k: [20, 25, 30, 35, 40, 50]
+      home_advantage: [70]
+      season_regression: [0.0, 0.1]
+      new_team_offset: [0, 100, 200]
+      calib_seasons: [3, 6, 10]
+      use_margin: [true]
