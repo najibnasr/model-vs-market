@@ -28,9 +28,10 @@ from mvm.core.io import load_config, read_table
 from mvm.core.market import market_probabilities
 from mvm.core.splits import walk_forward, week_key
 from mvm.sports.foot.models.baseline import LeagueBaseRates
+from mvm.sports.foot.models.dixon_coles import DixonColes
 from mvm.sports.foot.models.elo import FootElo
 
-MODELS = {"elo": FootElo}
+MODELS = {"elo": FootElo, "dc": DixonColes}
 
 
 def season_range(ev_cfg: dict, split: str) -> tuple[str, str]:
@@ -108,6 +109,9 @@ def evaluate_model(cfg: dict, model_name: str, split: str) -> dict[str, pd.DataF
         "base": run_walk_forward(LeagueBaseRates(), events, seasons),
         "market": market_preds(odds, events, ref),
     }
+    rivals = [m for m in MODELS if m != model_name]  # ex. Dixon-Coles est comparé à Elo
+    for r in rivals:
+        preds[r] = run_walk_forward(MODELS[r](**cfg["models"][r]["params"]), events, seasons)
     meta = events.set_index("event_id")[["league", "tier", "season", "kickoff_date"]]
     meta = meta.assign(week=week_key(meta["kickoff_date"]))
     sc = evaluate.score_sources(evaluate.common_sample(preds, meta), list(preds))
@@ -120,7 +124,13 @@ def evaluate_model(cfg: dict, model_name: str, split: str) -> dict[str, pd.DataF
         "by_season": evaluate.summary(sc, srcs, ["season"]),
         "paired": pd.concat(
             [
-                evaluate.paired_table(sc, [(model_name, "market"), (model_name, "base")], m, **boot)
+                evaluate.paired_table(
+                    sc,
+                    [(model_name, "market"), (model_name, "base")]
+                    + [(model_name, r) for r in rivals],
+                    m,
+                    **boot,
+                )
                 for m in ("log_loss", "rps")
             ]
         ),

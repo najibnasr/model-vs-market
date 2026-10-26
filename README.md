@@ -35,6 +35,8 @@ make test
 make market-baseline   # how good is the closing market? (the bar to clear)
 make tune-elo          # grid search on the tuning seasons only
 make eval-elo          # Elo vs market vs naive base rates, tuning seasons
+make tune-dc           # Dixon-Coles grid search (time decay, L2 prior)
+make eval-dc           # Dixon-Coles vs market, base rates and Elo
 ```
 
 Outputs: `data/processed/foot/*.parquet`, and audit reports in `reports/`

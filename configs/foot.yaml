@@ -83,3 +83,15 @@ models:
       new_team_offset: [-100, -50, 0, 50]
       calib_seasons: [10, 15, 99]
       use_margin: [true]
+
+  dc:
+    # Dixon-Coles par pays. xi : décroissance temporelle par jour (demi-vie = ln2 / xi).
+    # l2 : force du prior qui tire attaque/défense vers la moyenne de la ligue.
+    params:
+      xi: 0.0035
+      l2: 3.0
+      max_age_days: 1460
+    grid:
+      xi: [0.0015, 0.0025, 0.0035, 0.005, 0.0065]
+      l2: [1.0, 3.0, 10.0]
+      max_age_days: [1460]

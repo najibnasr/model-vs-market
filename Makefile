@@ -1,4 +1,4 @@
-.PHONY: install data data-offline test lint market-baseline tune-elo eval-elo test-elo
+.PHONY: install data data-offline test lint market-baseline tune-elo eval-elo test-elo tune-dc eval-dc test-dc
 
 # PYTHONPATH=src : robuste même si l'install éditable n'est pas vue par Python (cas macOS + Python 3.13)
 RUN = PYTHONPATH=src uv run
@@ -35,3 +35,13 @@ eval-elo:
 # Évaluation sur le TEST : une seule fois par modèle final (journalisée dans reports/test_log.csv)
 test-elo:
 	$(RUN) python -m mvm.sports.foot.run_model eval --model elo --split test --confirm-test
+
+# Étape (d) : Dixon-Coles (comparé au marché, au naïf ET à Elo)
+tune-dc:
+	$(RUN) python -m mvm.sports.foot.run_model tune --model dc
+
+eval-dc:
+	$(RUN) python -m mvm.sports.foot.run_model eval --model dc --split tuning
+
+test-dc:
+	$(RUN) python -m mvm.sports.foot.run_model eval --model dc --split test --confirm-test
