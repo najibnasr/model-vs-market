@@ -64,21 +64,30 @@ def simulate(n_seasons: int = 10, n_teams: int = 12, first_year: int = 2005, see
                     )
                 )
                 p = true_probs(lam_h, lam_a)
-                noisy = np.clip(p * np.exp(rng.normal(0, 0.03, 3)), 0.01, None)
-                noisy = np.clip(noisy / noisy.sum(), 0.01, 0.95)  # cote > 1 garantie
-                price = 1 / (noisy * 1.03)
-                for o, price_o in zip("HDA", price, strict=True):
-                    odds.append(
-                        dict(
-                            event_id=eid,
-                            bookmaker="pinnacle",
-                            market="1x2",
-                            timing="closing",
-                            outcome=o,
-                            decimal_odds=price_o,
-                            source_column="PSC" + o,
+                # (book, moment, bruit, marge) : la clôture est plus précise que le pré-match,
+                # la moyenne du marché a plus de marge, le "max" a une marge quasi nulle.
+                books = [
+                    ("pinnacle", "closing", 0.03, 1.03),
+                    ("pinnacle", "pre_match", 0.08, 1.03),
+                    ("market_avg", "pre_match", 0.08, 1.06),
+                    ("market_max", "pre_match", 0.08, 1.005),
+                ]
+                for book, timing, sd, margin in books:
+                    noisy = np.clip(p * np.exp(rng.normal(0, sd, 3)), 0.01, None)
+                    noisy = np.clip(noisy / noisy.sum(), 0.01, 0.95)  # cote > 1 garantie
+                    price = 1 / (noisy * margin)
+                    for o, price_o in zip("HDA", price, strict=True):
+                        odds.append(
+                            dict(
+                                event_id=eid,
+                                bookmaker=book,
+                                market="1x2",
+                                timing=timing,
+                                outcome=o,
+                                decimal_odds=price_o,
+                                source_column=f"{book}_{timing}_{o}",
+                            )
                         )
-                    )
             for t in divisions[lg]:
                 strength[t] += rng.normal(0, 0.08)  # dérive entre saisons
         # montées / descentes : 2 derniers de E0 <-> 2 premiers de E1

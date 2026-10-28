@@ -105,3 +105,22 @@ models:
   ens:
     # Moyenne simple Elo / Dixon-Coles, poids fixés a priori (aucun réglage).
     weights: { elo: 0.5, dc: 0.5 }
+
+# ---------------------------------------------------------------------------------------------
+# Étape (e) : backtest de value betting. Stratégie PRINCIPALE figée le 2026-10-28, avant tout
+# backtest. Les variantes (autres seuils, autres prix) sont des analyses de sensibilité.
+# ---------------------------------------------------------------------------------------------
+betting:
+  model: ens
+  bet_bookmaker: pinnacle
+  bet_timing: pre_match
+  price_sensitivity: [market_avg, market_max]
+  clv_reference: { bookmaker: pinnacle, timing: closing, margin_method: shin }
+  strategy:
+    min_edge: 0.05
+    kelly_fraction: 0.25
+    max_stake: 0.02
+    max_week_exposure: 0.25
+    max_odds: 10.0
+  edge_grid: [0.0, 0.02, 0.05, 0.10, 0.15]
+  initial_bankroll: 1000

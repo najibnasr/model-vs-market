@@ -38,6 +38,8 @@ make eval-elo          # Elo vs market vs naive base rates, tuning seasons
 make tune-dc           # Dixon-Coles grid search (time decay, L2 prior)
 make eval-dc           # Dixon-Coles vs market, base rates and Elo
 make eval-ens          # 50/50 Elo + Dixon-Coles combination
+make predict           # cache walk-forward predictions of all models
+make backtest          # value betting, Kelly, CLV and blend test (tuning seasons)
 ```
 
 Outputs: `data/processed/foot/*.parquet`, and audit reports in `reports/`

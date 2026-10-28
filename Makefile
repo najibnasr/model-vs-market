@@ -1,4 +1,4 @@
-.PHONY: install data data-offline test lint market-baseline tune-elo eval-elo test-elo tune-dc eval-dc test-dc eval-ens test-ens
+.PHONY: install data data-offline test lint market-baseline tune-elo eval-elo test-elo tune-dc eval-dc test-dc eval-ens test-ens predict backtest test-backtest
 
 # PYTHONPATH=src : robuste même si l'install éditable n'est pas vue par Python (cas macOS + Python 3.13)
 RUN = PYTHONPATH=src uv run
@@ -52,3 +52,13 @@ eval-ens:
 
 test-ens:
 	$(RUN) python -m mvm.sports.foot.run_model eval --model ens --split test --confirm-test
+
+# Étape (e) : backtest de paris. `predict` met en cache les prédictions (environ 10 minutes).
+predict:
+	$(RUN) python -m mvm.sports.foot.betting predict
+
+backtest:
+	$(RUN) python -m mvm.sports.foot.betting backtest --split tuning
+
+test-backtest:
+	$(RUN) python -m mvm.sports.foot.betting backtest --split test --confirm-test
