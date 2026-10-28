@@ -39,4 +39,35 @@ Errors that differ are the textbook case for combining forecasts.
 Defined after seeing the tuning results above but **before** any test-period run, with weights
 fixed a priori (no tuning).
 
-_Tuning-period results and test expectations to be added._
+### Tuning period
+
+| Source | Log-loss | RPS |
+|---|---|---|
+| Elo | 1.0140 | 0.2056 |
+| Dixon-Coles | 1.0150 | 0.2060 |
+| **Elo + DC (50/50)** | **1.0125** | **0.2053** |
+| Pinnacle close | 0.9973 | 0.2006 |
+
+- Combination vs Elo: -0.0015, CI [-0.0023, -0.0006]. Vs Dixon-Coles: -0.0025,
+  CI [-0.0033, -0.0016]. **Significantly better than both members** on log-loss and RPS.
+- Closes 79% of the base-rate-to-market gap (Elo: 77%).
+- Home calibration in between the two members (45.1% predicted vs 44.8% observed).
+- Still under-confident on heavy favourites (81.5% predicted, 84.7% observed), inherited from
+  Dixon-Coles.
+
+**Caveat.** The combination was motivated by patterns seen on these same tuning seasons, so its
+tuning-period advantage is partly circular. Only the test period counts.
+
+## Expectations written BEFORE running the test period (2017-18 to 2024-25)
+
+1. **Dixon-Coles improves relative to Elo** compared with the tuning period (DC minus Elo below
+   +0.0010), because Elo's home bias grew on the test period and time decay should handle it.
+   Whether the difference becomes significant is left open.
+2. **The combination beats Elo** (whole CI below zero).
+3. **The combination beats Dixon-Coles** (whole CI below zero).
+4. All three models stay behind the market overall, by +0.012 to +0.022.
+5. No model beats the market in any league (no league CI entirely below zero).
+
+## Test period
+
+_Run once each with `make test-dc` and `make test-ens`, filled in after the runs._
