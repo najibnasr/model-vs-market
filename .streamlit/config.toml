@@ -1,0 +1,16 @@
+[theme]
+base = "dark"
+primaryColor = "#4ea1ff"
+backgroundColor = "#0c231c"
+secondaryBackgroundColor = "#12342a"
+textColor = "#efeee6"
+font = "Barlow:https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap"
+headingFont = "'Big Shoulders Display':https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&display=swap"
+borderColor = "#2a5446"
+baseRadius = "6px"
+
+[client]
+toolbarMode = "viewer"
+
+[browser]
+gatherUsageStats = false

@@ -38,10 +38,40 @@ def sim_config(tmp_path_factory):
     return str(path)
 
 
-@pytest.mark.parametrize("page", ["Match par match", "Calibration", "Backtest", "Méthodologie"])
-def test_page_renders_without_exception(sim_config, page):
+PAGES = ["Le duel", "La journée", "Ton club", "Et si tu avais parié ?", "Coulisses"]
+LAB_VIEWS = ["Log-loss match par match", "Calibration", "Backtest détaillé", "Méthodologie"]
+
+
+def _app(sim_config):
     os.environ["MVM_CONFIG"] = sim_config
-    at = AppTest.from_file(str(DASHBOARD), default_timeout=120)
+    at = AppTest.from_file(str(DASHBOARD), default_timeout=180)
     at.run()
-    at.sidebar.radio[0].set_value(page).run()
     assert not at.exception, at.exception
+    return at
+
+
+@pytest.mark.parametrize("page", PAGES)
+def test_page_renders_without_exception(sim_config, page):
+    at = _app(sim_config)
+    at.radio(key="page").set_value(page).run()
+    assert not at.exception, at.exception
+
+
+@pytest.mark.parametrize("view", LAB_VIEWS)
+def test_lab_view_renders_without_exception(sim_config, view):
+    at = _app(sim_config)
+    at.radio(key="page").set_value("Coulisses").run()
+    at.radio(key="lab_view").set_value(view).run()
+    assert not at.exception, at.exception
+
+
+def test_team_codes_and_kits():
+    from mvm.app import ui
+
+    assert ui.team_code("Man United") == "MUN"
+    assert ui.team_code("Man City") == "MCI"
+    assert ui.team_code("FC Koln") == "KOL"
+    assert ui.team_code("Bayern Munich") == "BAY"
+    assert ui.team_code("Real Madrid") == "RMA"
+    (h, _), (a, _) = ui.kits("Arsenal", "Arsenal")
+    assert h != a  # deux équipes d'un même match n'ont jamais la même couleur

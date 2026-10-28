@@ -1,0 +1,141 @@
+/* Thème « match de nuit » du dashboard. Couleurs : voir aussi ui.py (graphiques). */
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&display=swap');
+:root {
+  --night:#0c231c; --turf:#12342a; --turf2:#184237; --chalk:#efeee6; --dim:#a9b8ae;
+  --line:rgba(239,238,230,.14); --model:#4ea1ff; --book:#ff8a3d;
+}
+.stApp {
+  background-color: var(--night);
+  background-image: repeating-linear-gradient(180deg, rgba(255,255,255,.016) 0 90px,
+                    transparent 90px 180px);
+}
+.stApp, .stApp p, .stApp label, .stApp input, .stApp textarea, .stApp button,
+.stApp li, .stApp td, .stApp th { font-family: 'Barlow', sans-serif; }
+.stApp h1, .stApp h2, .stApp h3 {
+  font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; letter-spacing: .01em;
+}
+header[data-testid="stHeader"] { background: transparent; }
+.block-container { padding-top: 2.2rem; max-width: 1180px; }
+section[data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"] { display: none; }
+
+/* navigation : le radio horizontal devient une barre d'onglets */
+.st-key-nav [role="radiogroup"] { gap: 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.st-key-nav [role="radiogroup"] label {
+  padding: .55rem 1rem .6rem; margin: 0; border-bottom: 3px solid transparent; cursor: pointer;
+}
+.st-key-nav label[data-testid="stRadioOption"] > div > div:first-child:not([data-testid]) { display: none; }
+.st-key-nav [role="radiogroup"] label p { font-size: 1.02rem; font-weight: 600; color: var(--dim); }
+.st-key-nav [role="radiogroup"] label[data-selected="true"] { border-bottom-color: var(--chalk); }
+.st-key-nav [role="radiogroup"] label[data-selected="true"] p { color: var(--chalk); }
+.st-key-nav label:has(input:focus-visible), .st-key-subnav label:has(input:focus-visible) {
+  outline: 2px solid var(--model); outline-offset: 2px; }
+.st-key-subnav label[data-testid="stRadioOption"] > div > div:first-child:not([data-testid]) { display: none; }
+.st-key-subnav [role="radiogroup"] label {
+  padding: .3rem .8rem; border: 1px solid var(--line); border-radius: 999px; margin-right: .4rem;
+}
+.st-key-subnav [role="radiogroup"] label[data-selected="true"] { background: var(--chalk); }
+.st-key-subnav [role="radiogroup"] label[data-selected="true"] p { color: var(--night); }
+
+.brand { display:flex; align-items:baseline; gap:.9rem; flex-wrap:wrap; margin-bottom:.4rem; }
+.brand h1 { font-size: 2.6rem; line-height: 1; margin: 0; padding: 0; }
+.brand h1 .m { color: var(--model); } .brand h1 .b { color: var(--book); }
+.brand > span { color: var(--dim); font-size: .98rem; }
+.lede { color: var(--dim); max-width: 68ch; font-size: 1.05rem; margin: .2rem 0 1.2rem; }
+.section { font-family:'Big Shoulders Display'; font-weight:800; font-size:1.7rem;
+           margin: 2rem 0 .2rem; color: var(--chalk); }
+.note { color: var(--dim); font-size: .9rem; max-width: 72ch; }
+
+/* tableau d'affichage */
+.board { position:relative; overflow:hidden; background: var(--turf); border:1px solid var(--line);
+          border-radius: 10px; padding: 1.6rem 1rem 1.3rem; margin: .4rem 0 .8rem; }
+.board svg.pitch { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.board .row { position:relative; display:grid; grid-template-columns: 1fr auto 1fr;
+              align-items:center; text-align:center; }
+.board .who { font-weight:600; font-size:1.05rem; letter-spacing:.02em; }
+.board .who.m { color: var(--model); } .board .who.b { color: var(--book); }
+.board .big { font-family:'Big Shoulders Display'; font-weight:900; line-height:.95;
+              font-size: clamp(3.4rem, 9vw, 6.6rem); font-variant-numeric: tabular-nums; }
+.board .mid { font-family:'Big Shoulders Display'; font-weight:800; font-size:3rem; color:var(--dim);
+              padding: 0 1.2rem; }
+.board .kit { height:6px; width:64px; margin:.5rem auto 0; border-radius:3px; }
+.board .foot { position:relative; text-align:center; color:var(--dim); margin-top:.9rem; font-size:.98rem; }
+
+/* deux barres face à face */
+.vs { display:grid; grid-template-columns: 9.5rem 1fr 4.2rem; gap:.4rem .8rem; align-items:center;
+       max-width: 760px; margin: .4rem 0 .2rem; }
+.vs .lab { font-weight:600; } .vs .val { font-variant-numeric: tabular-nums; font-weight:700; text-align:right; }
+.vs .track { background: rgba(239,238,230,.08); border-radius:3px; height:14px; }
+.vs .fill { height:14px; border-radius:3px; }
+
+/* classement */
+table.standings { width:100%; max-width: 900px; border-collapse:collapse; margin:.5rem 0; }
+table.standings th { text-align:left; color:var(--dim); font-weight:500; font-size:.88rem;
+                     border-bottom:1px solid var(--line); padding:.45rem .6rem; }
+table.standings td { padding:.6rem .6rem; border-bottom:1px solid var(--line); font-variant-numeric: tabular-nums; }
+table.standings td.pos { font-family:'Big Shoulders Display'; font-weight:800; font-size:1.3rem; width:2.4rem; color:var(--dim); }
+table.standings td.name { font-weight:600; }
+table.standings td.name small { display:block; color:var(--dim); font-weight:400; }
+table.standings tr.ref td { background: rgba(255,138,61,.08); }
+table.standings tr.ref td.pos { color: var(--book); }
+table.standings tr.mod td.pos { color: var(--model); }
+
+/* cartes de match */
+.mcard { background: var(--turf); border:1px solid var(--line); border-radius:8px;
+          padding: .9rem 1rem .8rem; margin-bottom: .9rem; }
+.mcard .date { color: var(--dim); font-size:.85rem; margin-bottom:.4rem; }
+.mhead { display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; gap:.6rem; }
+.mhead .team { display:flex; align-items:center; gap:.5rem; font-weight:600; font-size:1.02rem; min-width:0; }
+.mhead .team span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mhead .team.away { flex-direction: row-reverse; text-align:right; }
+.mhead .score { font-family:'Big Shoulders Display'; font-weight:900; font-size:1.9rem; line-height:1;
+                background: var(--night); border-radius:4px; padding:.25rem .6rem; font-variant-numeric: tabular-nums; }
+.prow { display:grid; grid-template-columns: 6.6rem 1fr; gap:.6rem; align-items:center; margin-top:.55rem; }
+.prow .who { font-size:.88rem; font-weight:600; display:flex; align-items:center; gap:.4rem; }
+.prow .who i { width:9px; height:9px; border-radius:50%; display:inline-block; }
+.pbar { display:flex; height:22px; border-radius:3px; overflow:hidden; font-size:.8rem; font-weight:700; }
+.pbar div { display:flex; align-items:center; justify-content:center; white-space:nowrap; overflow:hidden; }
+.pbar div.hit { box-shadow: inset 0 0 0 2px var(--chalk); }
+.mfoot { margin-top:.65rem; font-size:.9rem; color: var(--dim); }
+.mfoot b.m { color: var(--model); } .mfoot b.b { color: var(--book); } .mfoot b.t { color: var(--chalk); }
+.ticket { margin-top:.55rem; border:1px dashed rgba(239,238,230,.35); border-radius:5px; padding:.4rem .6rem;
+          font-size:.88rem; display:flex; justify-content:space-between; gap:.6rem; }
+.ticket .res { font-weight:700; white-space:nowrap; }
+.ticket .res.won { color: #3ddc97; } .ticket .res.lost { color: var(--dim); }
+
+.crest { flex:none; display:inline-flex; width:var(--s); height:calc(var(--s) * 1.15);
+         background: rgba(239,238,230,.6); padding:1.5px;
+         clip-path: polygon(50% 0, 100% 12%, 100% 52%, 88% 78%, 50% 100%, 12% 78%, 0 52%, 0 12%); }
+.crest > span { flex:1; display:flex; align-items:center; justify-content:center; background:var(--bg);
+                color:var(--fg); font-family:'Big Shoulders Display'; font-weight:900;
+                font-size:calc(var(--s) * .4); padding-bottom:calc(var(--s) * .1);
+                clip-path: polygon(50% 0, 100% 12%, 100% 52%, 88% 78%, 50% 100%, 12% 78%, 0 52%, 0 12%); }
+.cards { display:grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 430px), 1fr));
+          gap:.9rem; align-items:start; }
+.cards .mcard { margin:0; }
+
+/* fil de la saison d'un club */
+.strip { display:flex; flex-wrap:wrap; gap:4px; margin:.4rem 0 .3rem; }
+.strip div { width:26px; height:30px; border-radius:3px; display:flex; align-items:center; justify-content:center;
+             font-family:'Big Shoulders Display'; font-weight:800; font-size:1rem; color: var(--night); }
+.legend { display:flex; gap:1.2rem; flex-wrap:wrap; color:var(--dim); font-size:.88rem; }
+.legend i { display:inline-block; width:11px; height:11px; border-radius:2px; margin-right:.35rem; vertical-align:-1px; }
+
+.clubhero { display:flex; align-items:center; gap:1.1rem; margin:.6rem 0 .2rem; }
+.clubhero h2 { font-size:2.6rem; margin:0; padding:0; line-height:1; }
+.clubhero p { color:var(--dim); margin:.2rem 0 0; }
+
+/* les trois parieurs */
+.bettor { background: var(--turf); border:1px solid var(--line); border-radius:8px; padding:1rem 1.1rem;
+          border-top: 5px solid var(--c); height: 100%; }
+.bettor h4 { font-family:'Big Shoulders Display'; font-weight:800; font-size:1.5rem; margin:0 0 .15rem; padding:0; }
+.bettor .who { color:var(--dim); font-size:.9rem; min-height: 2.6em; }
+.bettor .amount { font-family:'Big Shoulders Display'; font-weight:900; font-size:2.6rem; line-height:1.05;
+                  margin:.6rem 0 .1rem; font-variant-numeric: tabular-nums; color: var(--c); }
+.bettor ul { padding-left: 1.1rem; margin:.4rem 0 0; color: var(--chalk); font-size:.92rem; }
+.bigline { font-family:'Big Shoulders Display'; font-weight:800; font-size: clamp(1.8rem, 4vw, 2.7rem);
+           line-height:1.1; margin: .3rem 0 .4rem; }
+.bigline .m { color: var(--model); }
+@media (max-width: 640px) {
+  .vs { grid-template-columns: 6.5rem 1fr 3.6rem; }
+  .board .mid { padding: 0 .4rem; font-size:2rem; }
+}
