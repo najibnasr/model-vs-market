@@ -41,6 +41,7 @@ make eval-ens          # 50/50 Elo + Dixon-Coles combination
 make predict           # cache walk-forward predictions of all models
 make backtest          # value betting, Kelly, CLV and blend test (tuning seasons)
 make test-backtest     # same on the test seasons, run once
+make app               # Streamlit dashboard (match by match, calibration, backtest, method)
 ```
 
 Outputs: `data/processed/foot/*.parquet`, and audit reports in `reports/`
@@ -55,5 +56,5 @@ See [`data/README.md`](data/README.md) for the data card.
 - [x] (c) Elo baseline ([`docs/results_elo.md`](docs/results_elo.md)): closes 76% of the gap between base rates and the closing market
 - [x] (d) Dixon-Coles and comparison ([`docs/results_dc.md`](docs/results_dc.md)): Elo and Dixon-Coles tie; their 50/50 combination beats both and closes 79% of the gap
 - [x] (e) Value-betting backtest ([`docs/results_betting.md`](docs/results_betting.md)): no exploitable edge; CLV -4.0% on the test period, validated by positive and negative controls
-- [ ] (f) Streamlit dashboard
+- [x] (f) Streamlit dashboard (`make app`): match-by-match model vs market, calibration, backtest with controls, methodology
 - [ ] (g) Research note and CV line
