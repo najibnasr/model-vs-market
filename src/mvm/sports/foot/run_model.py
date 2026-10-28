@@ -30,8 +30,10 @@ from mvm.core.splits import walk_forward, week_key
 from mvm.sports.foot.models.baseline import LeagueBaseRates
 from mvm.sports.foot.models.dixon_coles import DixonColes
 from mvm.sports.foot.models.elo import FootElo
+from mvm.sports.foot.models.ensemble import linear_pool
 
 MODELS = {"elo": FootElo, "dc": DixonColes}
+COMBOS = {"ens"}  # modèles combinés : pas de réglage propre, construits à partir des membres
 
 
 def season_range(ev_cfg: dict, split: str) -> tuple[str, str]:
@@ -101,17 +103,23 @@ def evaluate_model(cfg: dict, model_name: str, split: str) -> dict[str, pd.DataF
     events, odds = load(cfg)
     ev_cfg = cfg["evaluation"]
     seasons = eval_seasons(events, *season_range(ev_cfg, split))
-    params = cfg["models"][model_name]["params"]
     ref = ev_cfg["fallback_reference"] if split == "holdout" else ev_cfg["reference"]
 
+    members = {
+        m: run_walk_forward(MODELS[m](**cfg["models"][m]["params"]), events, seasons)
+        for m in MODELS
+    }
+    if model_name in COMBOS:
+        main = linear_pool(members, cfg["models"][model_name]["weights"])
+    else:
+        main = members.pop(model_name)
     preds = {
-        model_name: run_walk_forward(MODELS[model_name](**params), events, seasons),
+        model_name: main,
         "base": run_walk_forward(LeagueBaseRates(), events, seasons),
         "market": market_preds(odds, events, ref),
+        **members,  # les autres modèles, pour les comparaisons appariées (ex. DC contre Elo)
     }
-    rivals = [m for m in MODELS if m != model_name]  # ex. Dixon-Coles est comparé à Elo
-    for r in rivals:
-        preds[r] = run_walk_forward(MODELS[r](**cfg["models"][r]["params"]), events, seasons)
+    rivals = list(members)
     meta = events.set_index("event_id")[["league", "tier", "season", "kickoff_date"]]
     meta = meta.assign(week=week_key(meta["kickoff_date"]))
     sc = evaluate.score_sources(evaluate.common_sample(preds, meta), list(preds))
@@ -162,7 +170,7 @@ def log_test_run(cfg: dict, model_name: str, split: str, overall: pd.DataFrame) 
                 "timestamp": datetime.now(UTC).isoformat(timespec="seconds"),
                 "model": model_name,
                 "split": split,
-                "params": json.dumps(cfg["models"][model_name]["params"], sort_keys=True),
+                "params": json.dumps(cfg["models"][model_name], sort_keys=True),
                 "log_loss_model": overall[f"log_loss_{model_name}"].iloc[0],
                 "log_loss_market": overall["log_loss_market"].iloc[0],
             }
@@ -176,7 +184,7 @@ def main(argv: list[str] | None = None) -> None:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     ap.add_argument("action", choices=["tune", "eval"])
-    ap.add_argument("--model", default="elo", choices=list(MODELS))
+    ap.add_argument("--model", default="elo", choices=[*MODELS, *COMBOS])
     ap.add_argument("--split", default="tuning", choices=["tuning", "test", "holdout"])
     ap.add_argument("--config", default="configs/foot.yaml")
     ap.add_argument("--confirm-test", action="store_true")
@@ -184,6 +192,8 @@ def main(argv: list[str] | None = None) -> None:
     cfg = load_config(args.config)
 
     if args.action == "tune":
+        if args.model in COMBOS:
+            raise SystemExit(f"'{args.model}' est une combinaison à poids fixés : rien à régler.")
         tune(cfg, args.model)
         return
     if args.split != "tuning" and not args.confirm_test:

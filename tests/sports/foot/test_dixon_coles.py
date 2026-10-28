@@ -83,3 +83,31 @@ def test_dixon_coles_beats_base_rates_on_simulated_league(sim):
         core_elo.expected_home_score(1500, 1500, 0)
     except NotImplementedError:
         return
+
+
+def test_linear_pool_averages_on_common_matches():
+    from mvm.sports.foot.models.ensemble import linear_pool
+
+    a = pd.DataFrame(
+        {
+            "event_id": ["x", "y"],
+            "week": [1, 1],
+            "p_H": [0.6, 0.2],
+            "p_D": [0.2, 0.3],
+            "p_A": [0.2, 0.5],
+            "outcome_idx": [0, 2],
+        }
+    )
+    b = pd.DataFrame(
+        {
+            "event_id": ["y", "z"],
+            "week": [1, 2],
+            "p_H": [0.4, 0.3],
+            "p_D": [0.3, 0.3],
+            "p_A": [0.3, 0.4],
+            "outcome_idx": [2, 1],
+        }
+    )
+    out = linear_pool({"a": a, "b": b}, {"a": 0.5, "b": 0.5})
+    assert list(out.event_id) == ["y"]
+    np.testing.assert_allclose(out[["p_H", "p_D", "p_A"]].to_numpy(), [[0.3, 0.3, 0.4]])
