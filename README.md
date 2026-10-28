@@ -3,7 +3,7 @@
 Probabilistic models of match outcomes benchmarked against bookmaker prices, with an honest
 value-betting backtest (fractional Kelly, transaction costs, closing line value).
 
-**Status:** football steps (a) data, (b) frozen protocol and (c) Elo baseline done.
+**Status:** football steps (a) to (d) done: data, frozen protocol, Elo, Dixon-Coles and their combination.
 
 The goal is not to find a money machine. Beating closing odds after costs is very hard; the
 deliverable is a rigorous, reproducible comparison between a model and an efficient market.
@@ -37,6 +37,7 @@ make tune-elo          # grid search on the tuning seasons only
 make eval-elo          # Elo vs market vs naive base rates, tuning seasons
 make tune-dc           # Dixon-Coles grid search (time decay, L2 prior)
 make eval-dc           # Dixon-Coles vs market, base rates and Elo
+make eval-ens          # 50/50 Elo + Dixon-Coles combination
 ```
 
 Outputs: `data/processed/foot/*.parquet`, and audit reports in `reports/`
@@ -49,7 +50,7 @@ See [`data/README.md`](data/README.md) for the data card.
 - [x] (a) Data pipeline and storage schema
 - [x] (b) Frozen evaluation protocol ([`docs/protocol.md`](docs/protocol.md)): walk-forward splits, margin removal, metrics
 - [x] (c) Elo baseline ([`docs/results_elo.md`](docs/results_elo.md)): closes 76% of the gap between base rates and the closing market
-- [ ] (d) Dixon-Coles and comparison
+- [x] (d) Dixon-Coles and comparison ([`docs/results_dc.md`](docs/results_dc.md)): Elo and Dixon-Coles tie; their 50/50 combination beats both and closes 79% of the gap
 - [ ] (e) Value-betting backtest: fractional Kelly, CLV, breakdown by league and period
 - [ ] (f) Streamlit dashboard
 - [ ] (g) Research note and CV line

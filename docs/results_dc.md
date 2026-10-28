@@ -68,6 +68,56 @@ tuning-period advantage is partly circular. Only the test period counts.
 4. All three models stay behind the market overall, by +0.012 to +0.022.
 5. No model beats the market in any league (no league CI entirely below zero).
 
-## Test period
+## Test period (2017-18 to 2024-25), run once each on 2026-10-28
 
-_Run once each with `make test-dc` and `make test-ens`, filled in after the runs._
+35,647 matches, common sample.
+
+| Source | Log-loss | RPS | Gap closed (base to market) |
+|---|---|---|---|
+| League base rates | 1.0756 | 0.2280 | 0% |
+| Elo | 1.0121 | 0.2064 | 76% |
+| Dixon-Coles | 1.0122 | 0.2064 | 76% |
+| **Elo + DC (50/50)** | **1.0099** | **0.2058** | **79%** |
+| Pinnacle close | 0.9925 | 0.2003 | 100% |
+
+Paired log-loss differences (95% CI, clustered by week):
+
+| Comparison | Mean diff | CI |
+|---|---|---|
+| DC vs Elo | +0.0001 | [-0.0013, +0.0014] |
+| Combination vs Elo | **-0.0022** | [-0.0029, -0.0015] |
+| Combination vs DC | **-0.0023** | [-0.0030, -0.0016] |
+| Combination vs market | +0.0175 | [+0.0157, +0.0194] |
+
+| Season | Elo | DC | Combination | Market |
+|---|---|---|---|---|
+| 2017-18 | 1.0016 | 1.0006 | **0.9990** | 0.9795 |
+| 2018-19 | 1.0050 | 1.0053 | **1.0032** | 0.9880 |
+| 2019-20 | 1.0287 | **1.0237** | 1.0238 | 1.0129 |
+| 2020-21 | 1.0239 | 1.0219 | **1.0204** | 0.9998 |
+| 2021-22 | 1.0166 | 1.0151 | **1.0135** | 0.9946 |
+| 2022-23 | **1.0070** | 1.0118 | 1.0073 | 0.9934 |
+| 2023-24 | 1.0062 | 1.0079 | **1.0047** | 0.9840 |
+| 2024-25 | 1.0090 | 1.0122 | **1.0084** | 0.9885 |
+
+### Checking the pre-registered expectations
+
+1. **Confirmed, weakly.** DC minus Elo goes from +0.0010 (tuning) to +0.0001 (test). Still not
+   significant: Elo and Dixon-Coles remain statistically indistinguishable.
+2. **Confirmed.** The combination beats Elo (-0.0022, whole CI below zero).
+3. **Confirmed.** The combination beats Dixon-Coles (-0.0023, whole CI below zero).
+4. **Confirmed.** All three models trail the market by +0.0175 to +0.0198.
+5. **Confirmed.** No model beats the market in any of the 12 leagues.
+
+### What the test period teaches
+
+- **The combination is robust**: best or within 0.0003 of the best model in all 8 test seasons.
+  The gain did not come from one lucky season.
+- **Dixon-Coles fixes the home bias.** Home wins predicted 43.5% vs 43.4% observed (Elo: 45.2%).
+  Its relative advantage over Elo is largest in 2019-20 and 2020-21 (-0.0050 and -0.0020), the
+  seasons with matches behind closed doors, consistent with time decay adapting to a drop in home
+  advantage. Exploratory: not pre-registered at the season level.
+- **More complex is not better, but different is.** Two models of equal accuracy, with
+  different errors, combine into a significantly better one.
+
+**Model carried forward to the betting backtest (step e): the 50/50 combination.**
