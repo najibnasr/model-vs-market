@@ -60,6 +60,47 @@ Pinnacle pre-match price.** Mixing in the model never improves on the market alo
 The blend weight was fixed at w = 0 on the tuning period, so the blend equals the market by
 construction on the test period: no separate test is needed.
 
-## Test period
+## Test period (2017-18 to 2024-25, 35,525 matches), run once on 2026-10-28
 
-_Run once with `make test-backtest`, filled in after the run._
+| Strategy | Bets | ROI | ROI 95% CI | CLV | CLV 95% CI | Quarter-Kelly bankroll |
+|---|---|---|---|---|---|---|
+| **Main: combination @ Pinnacle pre-match** | 22,875 | **-8.6%** | [-10.8%, -6.5%] | **-4.02%** | [-4.22%, -3.84%] | -99.9% |
+| Combination @ market average | 17,602 | -11.1% | [-13.5%, -8.6%] | -7.87% | [-8.05%, -7.69%] | -100% |
+| Combination @ best price (max) | 26,770 | -5.0% | [-7.0%, -2.9%] | -1.56% | [-1.74%, -1.38%] | -98% |
+| Edge > 0% | 31,833 | -6.4% | | -3.75% | | -99.8% |
+| Edge > 2% | 28,125 | -7.4% | | -3.86% | | -99.9% |
+| Edge > 10% | 15,892 | -8.8% | | -4.24% | | -99.9% |
+| Edge > 15% | 11,075 | -9.0% | | -4.36% | | -99.9% |
+| Elo alone | 24,230 | -6.5% | | -3.66% | | -99.7% |
+| Dixon-Coles alone | 25,240 | -8.1% | | -4.16% | | -99.9% |
+| **Positive control: oracle** | 10,966 | **+9.1%** | [+6.0%, +12.1%] | **+10.76%** | [+10.57%, +10.94%] | x9,100 |
+| **Negative control: base rates** | 31,454 | **-7.5%** | [-9.4%, -5.5%] | **-4.52%** | [-4.72%, -4.33%] | -99.8% |
+
+Every league has a negative CLV (best: Segunda Division, -2.8%).
+
+### Checking the pre-registered expectations
+
+1. **Confirmed.** Main strategy CLV -4.02%, whole CI below zero; ROI -8.6%.
+2. **Confirmed.** Oracle CLV +10.8% (CI above zero); base-rate control CLV -4.5% (CI below zero).
+3. **Failed on the number, confirmed on the substance, and more strongly than expected.** CLV
+   spans 0.61 point across thresholds (expected below 0.5), but in the "wrong" direction: it
+   gets **monotonically worse** as the threshold rises (-3.75% at 0%, -4.36% at 15%). The
+   larger the model's disagreement with the market, the worse the bet.
+4. **Failed.** Best-price CLV is -1.56%, not within half a point of zero. The tuning-period
+   result did not replicate. A plausible cause, not tested: the source of the market max changed
+   in 2019-20 (Betbrain then another aggregator), possibly with fewer books.
+5. **Confirmed.** No league with a CLV above +0.5%.
+
+### What the test period teaches
+
+- **The loss deepens, but because of the price, not the model.** Main CLV goes from -2.2%
+  (tuning) to -4.0% (test), and the no-information control moves by the same amount (-2.8% to
+  -4.5%). The model stays about half a point better than knowing nothing, in both periods. The
+  common shift matches the rise in Pinnacle's pre-match margin over time measured in step (b).
+- **When the model disagrees most with the market, the market is right.** CLV worsens with the
+  edge threshold and is worst on long odds (-5.8% between odds 5 and 10).
+- **Conclusion of the betting study.** A results-only model, even a well-calibrated combination
+  closing 79% of the information gap, has no exploitable edge against Pinnacle, before or at the
+  close. The blend weight is zero: the pre-match price already contains everything the model
+  knows. Any real edge would require information the market does not yet price (team news,
+  player-level data, speed), not a better treatment of past scores.
