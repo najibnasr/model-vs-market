@@ -87,10 +87,13 @@ models:
   dc:
     # Dixon-Coles par pays. xi : décroissance temporelle par jour (demi-vie = ln2 / xi).
     # l2 : force du prior qui tire attaque/défense vers la moyenne de la ligue.
+    # FIGÉ le 2026-10-28 après 2 grilles (période de réglage uniquement). Meilleur : 1.01501.
+    # xi = 0.002 (demi-vie d'environ 350 jours) est intérieur : 0.0015 et 0.0025 font moins bien.
+    # La fenêtre 6 ans contre 4 ans ne change presque rien (1.01501 contre 1.01511).
     params:
-      xi: 0.0035
+      xi: 0.002
       l2: 3.0
-      max_age_days: 1460
+      max_age_days: 2190
     # Grille 2 (dernière). Grille 1 : xi = 0.0015 au bord bas, à égalité avec 0.0025 (1.01531 contre
     # 1.01536). La valeur de l'article (0.0065) est nettement moins bonne (1.0227). Avec un xi
     # plus petit, la fenêtre de 4 ans tronque des poids non négligeables : on teste aussi 6 ans.
