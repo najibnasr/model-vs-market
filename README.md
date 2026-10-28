@@ -40,6 +40,7 @@ make eval-dc           # Dixon-Coles vs market, base rates and Elo
 make eval-ens          # 50/50 Elo + Dixon-Coles combination
 make predict           # cache walk-forward predictions of all models
 make backtest          # value betting, Kelly, CLV and blend test (tuning seasons)
+make test-backtest     # same on the test seasons, run once
 ```
 
 Outputs: `data/processed/foot/*.parquet`, and audit reports in `reports/`
