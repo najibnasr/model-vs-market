@@ -39,7 +39,7 @@ def kelly_fraction(p: np.ndarray, odds: np.ndarray) -> np.ndarray:
 
     À IMPLÉMENTER PAR NAJIB (voir le message de Claude pour la ligne exacte).
     """
-    raise NotImplementedError("kelly_fraction() : à implémenter")
+    return (p * odds - 1) / (odds - 1)
 
 
 @dataclass(frozen=True)
