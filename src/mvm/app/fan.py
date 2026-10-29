@@ -183,9 +183,11 @@ def page_week():
             st.html(ui.upcoming_card(r))
             prev = picks.get(eid, -1)
             key = f"pick_{eid}"
+            closed = data.kicked_off(r.kickoff_date, r.kickoff_time)
             st.segmented_control(
-                "Your call",
+                "Your call" + (" (closed: kick-off has passed)" if closed else ""),
                 OUT_LABELS,
+                disabled=closed,
                 default=OUT_LABELS[int(prev)] if prev >= 0 else None,
                 key=key,
                 on_change=_on_pick,
@@ -204,7 +206,13 @@ def page_week():
 def _your_record(season: pd.DataFrame) -> None:
     picks = data.load_picks()
     picks = picks[picks.pick >= 0].set_index("event_id")
-    done = season.join(picks[["pick"]], how="inner")
+    done = season.join(picks[["pick", "picked_at"]], how="inner")
+    if len(done):  # un pronostic saisi après le coup d'envoi ne compte pas
+        valid = [
+            not data.kicked_off(d, t, pd.Timestamp(p).to_pydatetime())
+            for d, t, p in zip(done.kickoff_date, done.kickoff_time, done.picked_at, strict=True)
+        ]
+        done = done[valid]
     ui.section("You vs the model vs the bookmakers")
     if done.empty:
         n = len(picks)

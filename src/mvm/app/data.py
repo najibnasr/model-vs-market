@@ -218,6 +218,14 @@ def load_picks() -> pd.DataFrame:
     return df.sort_values("picked_at").groupby("event_id").tail(1)
 
 
+def kicked_off(date, time: str | None, now: datetime | None = None) -> bool:
+    """Heures de football-data.co.uk = heure de Londres. Sans heure, on ferme à minuit."""
+    now = now or datetime.now(UTC)
+    t = time if isinstance(time, str) and ":" in time else "00:00"
+    ko = pd.Timestamp(f"{pd.Timestamp(date):%Y-%m-%d} {t}").tz_localize("Europe/London")
+    return ko <= pd.Timestamp(now)
+
+
 def save_pick(event_id: str, pick: int | None) -> None:
     p = picks_path()
     p.parent.mkdir(parents=True, exist_ok=True)

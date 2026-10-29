@@ -122,3 +122,14 @@ def test_team_codes_and_kits():
     assert ui.team_code("Real Madrid") == "RMA"
     (h, _), (a, _) = ui.kits("Arsenal", "Arsenal")
     assert h != a  # deux équipes d'un même match n'ont jamais la même couleur
+
+
+def test_calls_close_at_kick_off_london_time():
+    from mvm.app import data
+
+    now = datetime(2026, 10, 29, 19, 50, tzinfo=UTC)  # 19:50 à Londres (heure d'hiver)
+    assert data.kicked_off("2026-10-29", "19:45", now)
+    assert not data.kicked_off("2026-10-29", "20:00", now)
+    assert data.kicked_off("2026-10-29", None, now)  # sans heure : fermé dès le jour J
+    summer = datetime(2026, 8, 15, 14, 30, tzinfo=UTC)  # 15:30 à Londres (heure d'été)
+    assert data.kicked_off("2026-08-15", "15:00", summer)

@@ -1,4 +1,4 @@
-.PHONY: install data data-offline test lint market-baseline tune-elo eval-elo test-elo tune-dc eval-dc test-dc eval-ens test-ens predict backtest test-backtest live live-offline app
+.PHONY: install data data-offline test lint market-baseline tune-elo eval-elo test-elo tune-dc eval-dc test-dc eval-ens test-ens predict backtest test-backtest live live-offline figures app
 
 # PYTHONPATH=src : robuste même si l'install éditable n'est pas vue par Python (cas macOS + Python 3.13)
 RUN = PYTHONPATH=src uv run
@@ -69,6 +69,10 @@ live:
 
 live-offline:
 	$(RUN) python -m mvm.sports.foot.live --offline
+
+# Étape (g) : figures du write-up (docs/figures), sur la période de test
+figures:
+	$(RUN) python -m mvm.sports.foot.figures
 
 # Étape (f) : dashboard (pré-requis : make predict, make backtest)
 app:
