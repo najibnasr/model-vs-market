@@ -23,7 +23,8 @@ written down before each test was run.
   information at all (-4.5%). A positive control that cheats with closing prices gains +10.8%,
   which shows the backtest can detect a real edge when there is one.
 - **The model's largest disagreements with the market are its worst bets**: closing line value
-  gets monotonically worse as the betting threshold rises. Mixing the model into the pre-match
+  gets monotonically worse as the betting threshold rises, and the realised loss (-8.6% per bet)
+  is even twice what closing line value implies. Mixing the model into the pre-match
   price never improves it (optimal weight: zero).
 - Of 14 expectations registered before the test runs, 10 were confirmed, 1 only weakly, and 3
   failed. All are reported.
@@ -166,9 +167,18 @@ bets a week, a small negative edge compounds into a 99.9% loss.
 
 ![Actual profit against profit implied by CLV](figures/fig4_profit_vs_clv.png)
 
-**Profit is noise, CLV is signal.** Several leagues show a positive ROI while their CLV is
-negative (on the tuning seasons, Bundesliga +5.2% and La Liga +3.7%): that is luck, and CLV says
-so. Every league has a negative CLV on the test seasons.
+**CLV is the steadier measure, but here it understates the loss.** CLV moves smoothly while
+profit swings, and several leagues show a positive ROI with a negative CLV (on the tuning
+seasons, Bundesliga +5.2% and La Liga +3.7%): that is luck, and CLV says so. Every league has a
+negative CLV on the test seasons. But over all bets, the actual loss (-8.6% per bet, 95% CI
+[-10.8%, -6.5%]) is about twice what CLV implies (-4.0%), and the interval excludes the CLV
+figure; the tuning seasons show the same pattern (-5.7% against -2.2%). If the closing price
+were unbiased for these bets, the two would agree on average. A likely cause (hypothesis, not
+yet tested): the model bets mostly on outsiders, where its CLV is worst, and Pinnacle's close,
+even after Shin's correction, slightly overprices outsiders (in the 60-75% bucket, favourites
+won 68.4% of the time against 66.4% priced, on the test seasons). Measured against a close that
+overprices longshots, longshot bets look better than they are. The conclusion of the study only
+gets stronger; the lesson is that CLV is a benchmark with its own biases, not ground truth.
 
 ![CLV by edge threshold](figures/fig5_edge_threshold.png)
 
@@ -224,6 +234,10 @@ replicate on the test seasons and was dropped.
   pre-match price) and evaluated on the 2026-27 live season, the only fully unseen data left. The
   2025-26 holdout was partly viewed through the dashboard and will only count as secondary
   evidence.
+- **CLV as a yardstick.** The gap between realised returns and CLV suggests a residual
+  favourite-longshot bias in the closing price. Testing it means comparing ROI and CLV by odds
+  bucket, and trying the power method of margin removal on long odds, as a labelled robustness
+  check rather than a change of reference.
 - **Execution.** The backtest assumes every bet is accepted at the recorded price. Real books
   limit winning accounts and the recorded pre-match price is a snapshot, so a positive result
   would have needed further scrutiny. A negative one does not.

@@ -15,6 +15,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
+import matplotlib.ticker  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
@@ -114,7 +115,7 @@ def fig_gap_closed(df: pd.DataFrame, out: Path) -> dict:
     return {"log_loss": ll, "gap_closed": share}
 
 
-def _reliability(p: np.ndarray, hit: np.ndarray, n_bins: int = 12) -> pd.DataFrame:
+def _reliability(p: np.ndarray, hit: np.ndarray, n_bins: int = 10) -> pd.DataFrame:
     q = pd.qcut(p, n_bins, labels=False, duplicates="drop")
     return (
         pd.DataFrame({"p": p, "hit": hit, "q": q})
@@ -134,10 +135,11 @@ def fig_calibration(df: pd.DataFrame, out: Path) -> None:
     a.axhline(0, color=MUTED, lw=1)
     a.set_xlabel("Forecast probability (all outcomes pooled, equal-count bins)")
     a.set_ylabel("Observed minus forecast frequency")
-    a.yaxis.set_major_formatter(lambda v, _: f"{v * 100:+.0f} pt")
+    a.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.01))
+    a.yaxis.set_major_formatter(lambda v, _: "0" if abs(v) < 1e-9 else f"{v * 100:+.0f} pt")
     a.xaxis.set_major_formatter(lambda v, _: f"{v:.0%}")
-    a.set_title("Dixon-Coles is too cautious with favourites")
-    a.legend(loc="upper left")
+    a.set_title("Dixon-Coles is too cautious with favourites", pad=30)
+    a.legend(loc="lower left", bbox_to_anchor=(0, 1.0), ncol=3, fontsize=8.5)
 
     g = df.assign(home=(y == 0).astype(float)).groupby("season")
     seasons = [s[:4] + "-" + s[-2:] for s in g.size().index]
@@ -146,8 +148,8 @@ def fig_calibration(df: pd.DataFrame, out: Path) -> None:
         b.plot(seasons, bias, marker="o", ms=5, lw=2, color=C[s], label=NAMES[s])
     b.axhline(0, color=MUTED, lw=1)
     b.set_ylabel("Home wins: forecast minus observed (points)")
-    b.set_title("Elo over-predicts home wins")
-    b.legend(loc="best")
+    b.set_title("Elo over-predicts home wins", pad=30)
+    b.legend(loc="lower left", bbox_to_anchor=(0, 1.0), ncol=3, fontsize=8.5)
     b.tick_params(axis="x", rotation=45)
     fig.tight_layout()
     fig.savefig(out / "fig2_calibration.png")
@@ -232,7 +234,7 @@ def fig_profit_vs_clv(bets: pd.DataFrame, out: Path) -> None:
     ax.axhline(0, color=MUTED, lw=1)
     ax.set_xlabel("Bets, in chronological order (1 unit each)")
     ax.set_ylabel("Cumulative units")
-    ax.set_title("Results are noisy, CLV is not: same bets, two measures")
+    ax.set_title("Same bets, two measures: the actual loss is twice what CLV implies")
     ax.set_xlim(0, x[-1] * 1.18)
     fig.savefig(out / "fig4_profit_vs_clv.png")
     plt.close(fig)
