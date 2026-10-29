@@ -139,3 +139,11 @@ table.standings tr.mod td.pos { color: var(--model); }
   .vs { grid-template-columns: 6.5rem 1fr 3.6rem; }
   .board .mid { padding: 0 .4rem; font-size:2rem; }
 }
+
+/* ajouts : prose, matchs à venir, pronostics */
+.note.prose { font-size: 1rem; color: var(--chalk); }
+.mcard.upcoming .score { font-size: 1.15rem; padding: .45rem .6rem; color: var(--dim); }
+[class*="st-key-card_"] { gap: .35rem; margin-bottom: .9rem; }
+[class*="st-key-card_"] .mcard { margin-bottom: 0; }
+[class*="st-key-card_"] [data-testid="stWidgetLabel"] p { color: var(--dim); font-size: .85rem; }
+.st-key-week_league, .st-key-season_league { margin-bottom: .3rem; }

@@ -70,11 +70,14 @@ def simulate(n_seasons: int = 10, n_teams: int = 12, first_year: int = 2005, see
                     ("pinnacle", "closing", 0.03, 1.03),
                     ("pinnacle", "pre_match", 0.08, 1.03),
                     ("market_avg", "pre_match", 0.08, 1.06),
+                    ("market_avg", "closing", 0.035, 1.06),
                     ("market_max", "pre_match", 0.08, 1.005),
                 ]
                 for book, timing, sd, margin in books:
                     noisy = np.clip(p * np.exp(rng.normal(0, sd, 3)), 0.01, None)
-                    noisy = np.clip(noisy / noisy.sum(), 0.01, 0.95)  # cote > 1 garantie
+                    noisy = np.clip(
+                        noisy / noisy.sum(), 0.01, 0.93
+                    )  # cote > 1 garantie (marge <= 1.06)
                     price = 1 / (noisy * margin)
                     for o, price_o in zip("HDA", price, strict=True):
                         odds.append(
@@ -97,3 +100,27 @@ def simulate(n_seasons: int = 10, n_teams: int = 12, first_year: int = 2005, see
         divisions["E1"] = [t for t in divisions["E1"] if t not in up] + down
     ev = pd.DataFrame(events).sort_values(["kickoff_date", "event_id"]).reset_index(drop=True)
     return ev, pd.DataFrame(odds), strength
+
+
+def write_fixtures_csv(events: pd.DataFrame, odds: pd.DataFrame, path) -> None:
+    """Écrit des matchs (non joués) au format fixtures.csv de football-data.co.uk."""
+    pre = odds[odds.timing == "pre_match"]
+    wide = pre.pivot_table(
+        index="event_id", columns=["bookmaker", "outcome"], values="decimal_odds"
+    )
+    prefix = {"market_avg": "Avg", "market_max": "Max", "pinnacle": "PS"}
+    rows = []
+    for _, e in events.iterrows():
+        r = {
+            "Div": e.league,
+            "Date": f"{e.kickoff_date:%d/%m/%Y}",
+            "Time": "15:00",
+            "HomeTeam": e.home_team_id.split(":")[1],
+            "AwayTeam": e.away_team_id.split(":")[1],
+        }
+        for book, pre_ in prefix.items():
+            for o in "HDA":
+                if (book, o) in wide.columns and e.event_id in wide.index:
+                    r[f"{pre_}{o}"] = round(float(wide.loc[e.event_id, (book, o)]), 2)
+        rows.append(r)
+    pd.DataFrame(rows).to_csv(path, index=False)

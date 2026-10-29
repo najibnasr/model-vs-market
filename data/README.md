@@ -8,8 +8,12 @@ results and odds from several bookmakers. Notes on the columns: `football-data.c
 
 ## Scope
 
-- Seasons 2005-2006 to 2025-2026 (21 seasons). The current season 2026-2027 is excluded on
-  purpose: it is kept as a true forward test once the evaluation protocol is frozen.
+- Seasons 2005-2006 to 2025-2026 (21 complete seasons), plus the current season 2026-2027,
+  loaded only after the protocol and the models were frozen and refreshed weekly by `make live`
+  (forward test). Upcoming fixtures and their prices come from `fixtures.csv`, saved as
+  timestamped snapshots that are never overwritten.
+- From 2025-2026 on, football-data.co.uk no longer publishes Pinnacle prices: the live season is
+  compared with the market average (see `docs/live_2026_27.md`).
 - 12 leagues: top two tiers of England, Spain, Italy, Germany, France, plus the top tier of the
   Netherlands and Portugal. Second tiers are included to test whether markets are less efficient
   where liquidity is lower.

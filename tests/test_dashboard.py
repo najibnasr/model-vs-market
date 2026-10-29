@@ -1,34 +1,44 @@
-"""Test de fumée du dashboard : chaque page s'exécute sans erreur sur des données simulées."""
+"""Test de fumée du dashboard : chaque page s'exécute sans erreur sur des données simulées,
+avec et sans saison en cours."""
 
 import os
+from datetime import UTC, datetime
 from pathlib import Path
 
+import pandas as pd
 import pytest
 import yaml
 
 from mvm.core import backtest
 from mvm.core.io import load_config, write_table
-from mvm.sports.foot import betting
+from mvm.sports.foot import betting, live
 
-from .sports.foot.simulate import simulate
+from .sports.foot.simulate import simulate, write_fixtures_csv
 
 DASHBOARD = Path(__file__).resolve().parents[1] / "src" / "mvm" / "app" / "dashboard.py"
 AppTest = pytest.importorskip("streamlit.testing.v1").AppTest
+CUTOFF = pd.Timestamp("2026-10-26")
 
 
-@pytest.fixture(scope="module")
-def sim_config(tmp_path_factory):
-    try:
-        backtest.kelly_fraction(0.5, 2.2)
-    except NotImplementedError:
-        pytest.skip("kelly_fraction() pas encore implémentée")
-    d = tmp_path_factory.mktemp("dash")
-    ev, od, _ = simulate(n_seasons=13, n_teams=10, seed=7)
-    write_table(ev, d / "events.parquet")
-    write_table(od, d / "odds.parquet")
+def _setup(d: Path, with_live: bool) -> str:
+    if with_live:
+        ev, od, _ = simulate(n_seasons=22, n_teams=10, seed=7)
+        future = ev[(ev.season == "2026-2027") & (ev.kickoff_date >= CUTOFF)]
+        played = ev.drop(future.index)
+    else:
+        ev, od, _ = simulate(n_seasons=13, n_teams=10, seed=7)
+        played, future = ev, ev.iloc[:0]
+    write_table(played, d / "events.parquet")
+    write_table(od[od.event_id.isin(played.event_id)], d / "odds.parquet")
     cfg = load_config("configs/foot.yaml")
-    cfg["paths"] = {"processed": str(d), "reports": str(d)}
-    betting.predict_all(cfg)
+    cfg["paths"] = {"processed": str(d), "reports": str(d), "raw": str(d / "raw")}
+    if with_live:
+        snap = d / "raw" / "fixtures" / "fixtures_20261029T090000Z.csv"
+        snap.parent.mkdir(parents=True)
+        write_fixtures_csv(future, od, snap)
+        live.refresh(cfg, played, datetime(2026, 10, 29, 9, tzinfo=UTC))
+    else:
+        betting.predict_all(cfg)
     res = betting.run_backtest(cfg, "tuning")
     res["summary"].to_csv(d / "backtest_tuning_summary.csv", index=False)
     res["bets"].to_csv(d / "backtest_tuning_bets.csv", index=False)
@@ -38,8 +48,17 @@ def sim_config(tmp_path_factory):
     return str(path)
 
 
-PAGES = ["Le duel", "La journée", "Ton club", "Et si tu avais parié ?", "Coulisses"]
-LAB_VIEWS = ["Log-loss match par match", "Calibration", "Backtest détaillé", "Méthodologie"]
+@pytest.fixture(scope="module", params=["live", "no_live"])
+def sim_config(request, tmp_path_factory):
+    try:
+        backtest.kelly_fraction(0.5, 2.2)
+    except NotImplementedError:
+        pytest.skip("kelly_fraction() pas encore implémentée")
+    return _setup(tmp_path_factory.mktemp(request.param), request.param == "live")
+
+
+PAGES = ["This week", "Season 2026-27", "Your club", "Track record", "Backstage"]
+LAB_VIEWS = ["Log-loss match by match", "Calibration", "Detailed backtest", "Method"]
 
 
 def _app(sim_config):
@@ -57,12 +76,40 @@ def test_page_renders_without_exception(sim_config, page):
     assert not at.exception, at.exception
 
 
+def test_track_record_what_if_renders(sim_config):
+    at = _app(sim_config)
+    at.radio(key="page").set_value("Track record").run()
+    at.radio(key="track_view").set_value("What if you had bet?").run()
+    assert not at.exception, at.exception
+
+
 @pytest.mark.parametrize("view", LAB_VIEWS)
 def test_lab_view_renders_without_exception(sim_config, view):
     at = _app(sim_config)
-    at.radio(key="page").set_value("Coulisses").run()
+    at.radio(key="page").set_value("Backstage").run()
     at.radio(key="lab_view").set_value(view).run()
     assert not at.exception, at.exception
+
+
+def test_holdout_season_is_never_shown(sim_config):
+    os.environ["MVM_CONFIG"] = sim_config
+    from mvm.app import data
+
+    data.config.clear()
+    data.load_data.clear()
+    data.model_frame.clear()
+    assert "2025-2026" not in set(data.model_frame("ens").season)
+
+
+def test_picks_are_saved_and_last_one_wins(tmp_path, monkeypatch):
+    from mvm.app import data
+
+    monkeypatch.setattr(data, "picks_path", lambda: tmp_path / "my_picks.csv")
+    data.save_pick("abc", 0)
+    data.save_pick("abc", 2)
+    data.save_pick("xyz", None)
+    picks = data.load_picks().set_index("event_id")["pick"]
+    assert picks["abc"] == 2 and picks["xyz"] == -1
 
 
 def test_team_codes_and_kits():

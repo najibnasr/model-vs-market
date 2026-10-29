@@ -5,11 +5,11 @@ source:
   request_delay_s: 1.0        # politesse envers le site (une requête par seconde)
   timeout_s: 30
 
-# Saisons au format "AAAA-AAAA". La saison en cours (2026-2027) est volontairement exclue :
-# elle servira de test "forward" vraiment hors échantillon une fois le protocole figé.
+# Saisons au format "AAAA-AAAA". La saison en cours (2026-2027) n'est chargée qu'après le gel
+# du protocole et des modèles : c'est le test "forward", vraiment hors échantillon (make live).
 seasons:
   first: 2005
-  last: 2025                  # = saison 2025-2026, dernière saison complète
+  last: 2026                  # = saison 2026-2027, en cours (mise à jour par make live)
 
 # Deux niveaux par pays : on veut tester l'hypothèse "moins de liquidité => plus d'inefficience".
 leagues:
@@ -48,6 +48,7 @@ evaluation:
   test_first: 2017-2018         # 2017-2025 : test, regardé UNE fois par modèle final
   test_last: 2024-2025
   holdout: 2025-2026            # Pinnacle partiel : test secondaire, référence de repli
+  forward: 2026-2027            # saison en direct : prédictions journalisées avant chaque match
   outcomes: [H, D, A]
   reference: { bookmaker: pinnacle, timing: closing, margin_method: shin }
   fallback_reference: { bookmaker: market_avg, timing: closing, margin_method: shin }
@@ -124,3 +125,15 @@ betting:
     max_odds: 10.0
   edge_grid: [0.0, 0.02, 0.05, 0.10, 0.15]
   initial_bankroll: 1000
+
+# ---------------------------------------------------------------------------------------------
+# Direct (saison 2026-27). Pinnacle n'est plus publié depuis 2025-26 : référence de repli du
+# protocole (moyenne du marché), paris au prix moyen, meilleure cote en borne optimiste.
+# Décidé le 2026-10-29, AVANT le premier téléchargement de la saison (docs/live_2026_27.md).
+# ---------------------------------------------------------------------------------------------
+live:
+  fixtures_url: "https://www.football-data.co.uk/fixtures.csv"
+  reference: { bookmaker: market_avg, timing: closing, margin_method: shin }
+  upcoming_reference: { bookmaker: market_avg, timing: pre_match, margin_method: shin }
+  bet_bookmaker: market_avg
+  price_sensitivity: [market_max]

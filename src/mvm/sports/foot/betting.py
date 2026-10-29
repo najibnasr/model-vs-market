@@ -33,6 +33,7 @@ import pandas as pd
 from mvm.core import backtest, blend, metrics
 from mvm.core.io import load_config, read_table, write_table
 from mvm.core.market import market_probabilities, odds_matrix
+from mvm.core.splits import hide_results
 from mvm.sports.foot.models.baseline import LeagueBaseRates
 from mvm.sports.foot.models.ensemble import linear_pool
 from mvm.sports.foot.run_model import MODELS, eval_seasons, load, run_walk_forward, season_range
@@ -45,22 +46,39 @@ def predictions_path(cfg: dict) -> Path:
     return Path(cfg["paths"]["processed"]) / "predictions.parquet"
 
 
-def predict_all(cfg: dict) -> pd.DataFrame:
+def predict_all(
+    cfg: dict, upcoming: pd.DataFrame | None = None
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Walk-forward de tous les modèles de 2012-13 jusqu'à la dernière saison disponible (saison en
+    cours comprise), puis, si `upcoming` est fourni, prédiction des matchs à venir par les modèles
+    dans leur état final (ils ont vu tous les matchs joués, rien d'autre)."""
     events, _ = load(cfg)
     ev = cfg["evaluation"]
-    seasons = eval_seasons(events, ev["eval_first"], ev["holdout"])
-    preds = {}
-    for m, cls in MODELS.items():
+    seasons = eval_seasons(events, ev["eval_first"], ev.get("forward", ev["holdout"]))
+    members = {m: cls(**cfg["models"][m]["params"]) for m, cls in MODELS.items()}
+    members["base"] = LeagueBaseRates()
+    preds, ahead = {}, {}
+    for m, model in members.items():
         print(f"walk-forward {m}...", flush=True)
-        preds[m] = run_walk_forward(cls(**cfg["models"][m]["params"]), events, seasons)
-    preds["base"] = run_walk_forward(LeagueBaseRates(), events, seasons)
-    preds["ens"] = linear_pool(
-        {m: preds[m] for m in ("elo", "dc")}, cfg["models"]["ens"]["weights"]
-    )
+        preds[m] = run_walk_forward(model, events, seasons)
+        if upcoming is not None and len(upcoming):
+            ahead[m] = pd.DataFrame(model.predict(hide_results(upcoming)), columns=PCOLS).assign(
+                event_id=upcoming["event_id"].to_numpy()
+            )
+    weights = cfg["models"]["ens"]["weights"]
+    preds["ens"] = linear_pool({m: preds[m] for m in weights}, weights)
     long = pd.concat([df.assign(model=m) for m, df in preds.items()], ignore_index=True)
     write_table(long, predictions_path(cfg))
     print(f"{len(long)} prédictions écrites dans {predictions_path(cfg)}")
-    return long
+    if not ahead:
+        return long, pd.DataFrame()
+    total = sum(weights.values())
+    ens = sum(weights[m] / total * ahead[m][PCOLS].to_numpy() for m in weights)
+    ahead["ens"] = pd.DataFrame(ens / ens.sum(axis=1, keepdims=True), columns=PCOLS).assign(
+        event_id=upcoming["event_id"].to_numpy()
+    )
+    up = pd.concat([df.assign(model=m) for m, df in ahead.items()], ignore_index=True)
+    return long, up[["event_id", "model", *PCOLS]]
 
 
 def _wide(mat: pd.DataFrame, prefix: str) -> pd.DataFrame:

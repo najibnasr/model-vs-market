@@ -25,7 +25,7 @@ N_OUTCOMES = len(schema.MARKET_OUTCOMES["1x2"])
 
 def _load_aliases(path: str | Path) -> dict:
     p = Path(path)
-    if not p.exists():
+    if not path or not p.is_file():
         return {}
     with open(p, encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
