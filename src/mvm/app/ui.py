@@ -149,7 +149,8 @@ def scoreboard(model_wins: int, book_wins: int, ties: int, foot: str) -> str:
         '<div class="mid">–</div>'
         f'<div><div class="who b">The bookmakers</div><div class="big">{num(book_wins)}</div>'
         f'<div class="kit" style="background:{BOOK}"></div></div></div>'
-        f'<div class="foot">{foot}<br>{num(ties)} level (less than one point apart).</div>'
+        f'<div class="foot">{foot}<br>{num(ties)} too close to call '
+        "(less than one point apart).</div>"
         "</div>"
     )
 

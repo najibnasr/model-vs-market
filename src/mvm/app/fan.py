@@ -159,6 +159,12 @@ def page_week():
         "the games best, you, the model or the bookmakers."
         + (f" Last update: {ui.date_en(when, weekday=True)}." if when else "")
     )
+    if when and (up.kickoff_date.max() - pd.Timestamp(when.date())).days <= 1:
+        st.info(
+            "Only the last midweek matches are listed: football-data.co.uk publishes the next "
+            "round's fixtures and prices on Friday. Run `make live` again on Friday or Saturday "
+            "morning to get the weekend."
+        )
     league = _league_pills(up.league, "week_league", allow_all=True, default=up.league.iloc[0])
     games = _filter(up, league)
     fav_m = games[data.PCOLS].to_numpy().argmax(axis=1)
@@ -305,6 +311,44 @@ def page_season():
 # --- ton club -----------------------------------------------------------------------------------
 
 
+def _club_confidence(team: str, games: pd.DataFrame) -> None:
+    """Probabilité moyenne de victoire du club selon chacun : explique un duel déséquilibré."""
+    if games.empty:
+        return
+    home = (games.home == team).to_numpy()
+    p_mod = np.where(home, games.p_H, games.p_A).mean()
+    p_mkt = np.where(home, games.mkt_p_H, games.mkt_p_A).mean()
+    won = np.where(home, games.outcome_idx == 0, games.outcome_idx == 2).mean()
+    gap = p_mod - p_mkt
+    if abs(gap) < 0.03:
+        verdict = "The model and the bookmakers rate this club about the same."
+    elif gap < 0:
+        verdict = (
+            "The model rates this club lower than the bookmakers do. When a strong team keeps "
+            "winning, the more confident forecaster wins the duel almost every week: the model "
+            "is known to be too cautious with heavy favourites (it only sees past scores, and "
+            "its estimates are pulled towards the league average)."
+        )
+    else:
+        verdict = "The model rates this club higher than the bookmakers do."
+    ui.section(
+        f"How much does each believe in {team}?",
+        f"Average probability of a {html.escape(team)} win in these matches. "
+        f"Actual win rate: {ui.pct(won)}.",
+    )
+    st.html(
+        ui.versus_bars(
+            [
+                ("The model", p_mod, ui.MODEL),
+                ("The bookmakers", p_mkt, ui.BOOK),
+                ("Actual wins", won, ui.CHALK),
+            ],
+            1.0,
+        )
+        + f'<p class="note">{verdict}</p>'
+    )
+
+
 def page_club():
     df = data.model_frame("ens")
     clubs = pd.concat(
@@ -349,6 +393,8 @@ def page_club():
             f"Who read {html.escape(team)}'s matches better this season?",
         )
     )
+    _club_confidence(team, games)
+
     chips = []
     for _, r in games.iterrows():
         home = r.home == team
